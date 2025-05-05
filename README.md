@@ -224,6 +224,42 @@ buildQuery({ filter })
 => '?$filter=not ItemsProp/any(i:((i/SomeProp eq 1) or (i/AnotherProp eq 2)))'
 ```
 
+##### Explicit nested operator (`and`, `or`, and `not`) on collection properties
+```js
+const filter = {
+  ItemsProp: {
+    any: {
+      or: [
+        { not: [{ SomeProp: 1 }] },
+        { and: [{ SomeProp: 2, AnotherProp: 3 }] },
+      ]
+    }
+  }
+};
+
+buildQuery({ filter })
+=> '?$filter=ItemsProp/any(i:(not (i/SomeProp eq 1) or (i/SomeProp eq 2 and i/AnotherProp eq 3)))'
+```
+```js
+const filter = {
+  not: [
+    {
+      ItemsProp: {
+        any: {
+          or: [
+            { SomeProp: 1 },
+            { AnotherProp: 2 },
+          ]
+        }
+      }
+    }
+  ]
+};
+
+buildQuery({ filter })
+=> '?$filter=not (ItemsProp/any(i:(i/SomeProp eq 1 or i/AnotherProp eq 2)))'
+```
+
 ##### Implied all operators on collection item itself 
 ITEM_ROOT is special constant to mark collection with primitive type
 

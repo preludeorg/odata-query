@@ -666,6 +666,23 @@ describe('filter', () => {
       expect(actual).toEqual(expected);
     });
 
+    it('should handle collection operator with nested logical operators', () => {
+      const filter = {
+        Tasks: {
+          any: {
+            or: [
+              { and: { AssignedGroupId: 1234, StatusId: 299 } },
+              { not: [{ StatusId: 300 }] },
+            ],
+          },
+        },
+      };
+      const expected =
+        '?$filter=Tasks/any(tasks:((tasks/AssignedGroupId eq 1234 and tasks/StatusId eq 299) or (not ((tasks/StatusId eq 300)))))';
+      const actual = buildQuery({ filter });
+      expect(actual).toEqual(expected);
+    });
+
     it('should handle collection operator with a function', () => {
       const filter = {
         Tasks: {

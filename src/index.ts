@@ -205,6 +205,8 @@ function buildFilter<T>(filters: Filter<T> = {}, aliases: Alias[] = [], propPref
               propName = filterKey.replace(INDEXOF_REGEX, (_,$1)=>$1.trim() === ITEM_ROOT ? `(${propPrefix})` : `(${propPrefix}/${$1.trim()})`);
             } else if (FUNCTION_REGEX.test(filterKey)) {
               propName = filterKey.replace(FUNCTION_REGEX, (_,$1)=>$1.trim() === ITEM_ROOT ? `(${propPrefix})` : `(${propPrefix}/${$1.trim()})`);
+            } else if (LOGICAL_OPERATORS.indexOf(filterKey) !== -1) {
+              propName = propPrefix;
             } else {
               propName = `${propPrefix}/${filterKey}`;
             }
@@ -247,7 +249,7 @@ function buildFilter<T>(filters: Filter<T> = {}, aliases: Alias[] = [], propPref
           } else if (LOGICAL_OPERATORS.indexOf(propName) !== -1) {
             const op = propName;
             const builtFilters = Object.keys(value).map(valueKey =>
-              buildFilterCore({ [valueKey]: value[valueKey] })
+              buildFilterCore({ [valueKey]: value[valueKey] }, aliases, propPrefix)
             );
             if (builtFilters.length) {
               if (op === 'not') {
